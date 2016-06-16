@@ -9,11 +9,8 @@ const md5 = require('md5');
 const fs = require('fs');
 const spellChecker = require('spellchecker');
 const swearjar  = require('swearjar');
-const wd = require('worddefine');
-/*const math = require('./math');
-const gravatar = require('./gravatar');
-const sentance = require('./sentance');
-const age = require('./age');*/
+var wordnet = require('wordnet');
+
 
 let server = http.createServer(function(req, res){
   
@@ -122,13 +119,18 @@ let server = http.createServer(function(req, res){
       res.end();
       break;
     case 'dictonary':
-      var word = params[0];
-      console.log(word);
-      wd.define("words", function (err, word) {
-        if(err) return console.log("err: ", err);
-       console.log(word.definitions);
+      var sentance = decodeURI(params[0]);
+      //console.log(words);
+      res.write(`${sentance}: `);
+      var def = wordnet.lookup(sentance, function(err, definitions) {
+        if(err) return console.log(err);
+        definitions.forEach(function(definition) {
+
+          res.write(definition.glossary);
+        });
+        
+        res.end();
       });
-      res.end();
       break;
     default:
        res.end();  
